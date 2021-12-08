@@ -44,6 +44,12 @@ namespace Microsoft.PowerShell.Commands
         public char Delimiter { get; set; } = '=';
 
         /// <summary>
+        /// Gets or sets the separator.
+        /// </summary>
+        [Parameter(Position = 2)]
+        public string Separator { get; set; } = "/n";
+
+        /// <summary>
         /// </summary>
         protected override void ProcessRecord()
         {
@@ -55,7 +61,7 @@ namespace Microsoft.PowerShell.Commands
                 return;
             }
 
-            string[] lines = _stringData.Split('\n');
+            string[] lines = _stringData.Split(Separator);
 
             foreach (string line in lines)
             {
