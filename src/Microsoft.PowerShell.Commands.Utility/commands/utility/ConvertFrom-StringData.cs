@@ -47,7 +47,7 @@ namespace Microsoft.PowerShell.Commands
         /// Gets or sets the separator.
         /// </summary>
         [Parameter(Position = 2)]
-        public string Separator { get; set; } = "/n";
+        public string Separator { get; set; } = "\n";
 
         /// <summary>
         /// </summary>
