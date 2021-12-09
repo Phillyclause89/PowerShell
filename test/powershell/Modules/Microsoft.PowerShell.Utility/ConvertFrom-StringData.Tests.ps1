@@ -103,3 +103,50 @@ a:b
         $Result[$key] | Should -BeExactly $ExpectedResult.Values
     }
 }
+
+Describe "Separator parameter tests" -Tags "CI" {
+    BeforeAll  {
+        $TestCases = @(
+            @{ Separator = ' '; StringData = 'value0=10 value1=100 value3=1000'; ExpectedResult = @{ value0="10"; value1="100"; value3="1000"} }
+            @{ Separator = ', '; StringData = 'a=b, c=d, e=f' ; ExpectedResult = @{  a="b"; c="d"; e="f"} }
+            @{ Separator = ';'; StringData = 'cat = dog; car = truck' ; ExpectedResult = @{ cat = "dog"; car = "truck" } }
+            @{ Separator = '🐍'; StringData = 'name = snake 🐍 sound = sss 🐍 legs = 0' ; ExpectedResult = @{ name = "snake" ; sound = "sss" ; legs = "0" } }
+        )
+    }
+
+    It "Default Separator '\n' works" {
+        $actualValue = ConvertFrom-StringData -StringData "
+a=b
+c=d
+        "
+
+        $actualValue.Values | Sort-Object | Should -BeExactly @("b"; "d")
+        $actualValue.Keys | Sort-Object | Should -BeExactly @("a"; "c")
+        $actualValue.a | Should -Eq "b"
+        $actualValue.c | Should -Eq "d"
+
+    }
+
+    It "Should not throw on given Separator" {
+        $sampleData = "a=b, c=d"
+        { $sampleData | ConvertFrom-StringData -Separator ',' } | Should -Not -Throw
+    }
+
+    It 'is able to parse <StringData> with Separator "<Separator> with <stringdata>"' -TestCases $TestCases {
+        param($Separator, $StringData, $ExpectedResult)
+
+        $Result = ConvertFrom-StringData -StringData $StringData -Separator $Separator
+
+        $keys = $ExpectedResult.Keys | Sort-Object
+        $values = $ExpectedResult.Values | Sort-Object
+
+        # validate the keys in expected and result hashtables match
+        $Result.Keys | Sort-Object | Should -BeExactly $keys
+
+        # validate the values in expected and result hashtables match
+        $Result[$keys] | Sort-Object | Should -BeExactly $values
+    }
+
+
+
+}
